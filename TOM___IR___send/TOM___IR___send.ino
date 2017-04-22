@@ -12,8 +12,8 @@
 // class called "IRsend" containing only the protocols you want.
 // Now declare an instance of that sender.
 
-const int BUTTON1_PIN = 5;
-const int BUTTON2_PIN = 6;
+const int BUTTON1_PIN = A1;
+const int BUTTON2_PIN = A2;
 
 const int BUTTON1_LED = 7;
 const int BUTTON2_LED = 8;
@@ -27,19 +27,20 @@ void setup() {
 
   pinMode(BUTTON1_LED , OUTPUT);
   pinMode(BUTTON2_LED , OUTPUT);
-
+  
   delay(2000); while (!Serial); //delay for Leonardo
   Serial.println(F("Every time you press a key is a serial monitor we will send."));
 }
 
 void loop() {
-  
-  if (digitalRead(BUTTON1_PIN) == LOW){
+  int b1value = analogRead(BUTTON1_PIN);
+  if (b1value < 10){
     mySender.send(SONY,0xa8bca, 20);//Sony DVD power A8BCA, 20 bits
     Serial.println(F("Button1 Pressed"));
-    analogWrite(BUTTON1_LED , 100);
+    digitalWrite(BUTTON1_LED , HIGH); //analogWrite ok too
   }else{
-    analogWrite(BUTTON1_LED , 0);
+    Serial.println(F("Button1 NOT Pressed"));
+    digitalWrite(BUTTON1_LED , LOW);
   }
 
   int v = analogRead(BUTTON2_PIN);
@@ -47,12 +48,11 @@ void loop() {
   if (v < 10 ){
     mySender.send(SONY,0xa8bca, 20);//Sony DVD power A8BCA, 20 bits
     Serial.println(F("Button2 Pressed"));
-    analogWrite(BUTTON2_LED , 100);
+    digitalWrite(BUTTON2_LED , HIGH);
   }else{
-    analogWrite(BUTTON2_LED , 0);
+    digitalWrite(BUTTON2_LED , LOW);
     Serial.println(F("Button2 NOT Pressed"));
   }
-
   delay(500);
 
   //Serial.println("Nothing");
