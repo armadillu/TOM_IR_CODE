@@ -15,47 +15,50 @@
 const int BUTTON1_PIN = A1;
 const int BUTTON2_PIN = A2;
 
-const int BUTTON1_LED = 7;
-const int BUTTON2_LED = 8;
+const int BUTTON1_LED_PIN = 7;
+const int BUTTON2_LED_PIN = 8;
+
+bool DEBUG = false;
 
 IRsend mySender;
 
 void setup() {
   Serial.begin(9600);
-  pinMode(BUTTON1_PIN , INPUT);
-  pinMode(BUTTON2_PIN , INPUT);
-
-  pinMode(BUTTON1_LED , OUTPUT);
-  pinMode(BUTTON2_LED , OUTPUT);
+  pinMode(BUTTON1_PIN, INPUT);
+  pinMode(BUTTON2_PIN, INPUT);
+  pinMode(BUTTON1_LED_PIN, OUTPUT);
+  pinMode(BUTTON2_LED_PIN, OUTPUT);
   
   delay(2000); while (!Serial); //delay for Leonardo
-  Serial.println(F("Every time you press a key is a serial monitor we will send."));
+  Serial.println(F("Ready!"));
 }
 
 void loop() {
-  int b1value = analogRead(BUTTON1_PIN);
-  if (b1value < 10){
-    mySender.send(SONY,0xa8bca, 20);//Sony DVD power A8BCA, 20 bits
-    Serial.println(F("Button1 Pressed"));
-    digitalWrite(BUTTON1_LED , HIGH); //analogWrite ok too
-  }else{
-    Serial.println(F("Button1 NOT Pressed"));
-    digitalWrite(BUTTON1_LED , LOW);
+  
+  bool button1State = updateButton(BUTTON1_PIN, BUTTON1_LED_PIN);
+  if(button1State){
+    mySender.send(SONY,0xa8bca, 20);
+    if(DEBUG) Serial.println(F("button1 pressed"));
   }
 
-  int v = analogRead(BUTTON2_PIN);
-  Serial.println(v);
-  if (v < 10 ){
-    mySender.send(SONY,0xa8bca, 20);//Sony DVD power A8BCA, 20 bits
-    Serial.println(F("Button2 Pressed"));
-    digitalWrite(BUTTON2_LED , HIGH);
-  }else{
-    digitalWrite(BUTTON2_LED , LOW);
-    Serial.println(F("Button2 NOT Pressed"));
+  bool button2State = updateButton(BUTTON2_PIN, BUTTON2_LED_PIN);
+  if(button2State){
+    mySender.send(SONY,0xa8bca, 20);
+    if(DEBUG) Serial.println(F("button2 pressed"));
   }
-  delay(500);
-
-  //Serial.println("Nothing");
-  //}
+  
+  if(DEBUG) delay(100);
 }
 
+
+//return true if button is pressed
+bool updateButton(int buttonPin, int LEDpin){
+  int bValue = digitalRead(buttonPin);
+  if (bValue == HIGH){
+    digitalWrite(LEDpin, HIGH); //analogWrite ok too
+    return true;
+  }else{
+    digitalWrite(LEDpin, LOW);
+    return false;
+  }
+}
