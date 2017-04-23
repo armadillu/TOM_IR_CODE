@@ -18,7 +18,7 @@ const int BUTTON2_PIN = A2;
 const int BUTTON1_LED_PIN = 7;
 const int BUTTON2_LED_PIN = 8;
 
-bool DEBUG = false;
+bool DEBUG = true;
 
 IRsend mySender;
 
